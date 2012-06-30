@@ -23,8 +23,8 @@ module AirbrakeAPI
 
 end
 
-require 'airbrake-api/core_extensions'
-require 'airbrake-api/client'
-require 'airbrake-api/error'
-require 'airbrake-api/notice'
-require 'airbrake-api/project'
+require File.join(File.dirname(__FILE__),"airbrake-api/core_extensions.rb")
+require File.join(File.dirname(__FILE__),"airbrake-api/client")
+require File.join(File.dirname(__FILE__),"airbrake-api/error")
+require File.join(File.dirname(__FILE__),"airbrake-api/notice")
+require File.join(File.dirname(__FILE__),"airbrake-api/project")
