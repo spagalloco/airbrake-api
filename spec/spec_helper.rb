@@ -11,12 +11,17 @@ require 'fakeweb'
 
 require 'i18n'
 require 'airbrake'
+require 'pry'
 
 require File.expand_path('../../lib/airbrake-api', __FILE__)
 
 FakeWeb.allow_net_connect = false
 
-DEFAULTS = {:content_type => "application/xml; charset=utf-8", :status => ["403", "Forbidden"]}
+#DEFAULTS = {:content_type => "application/xml; charset=utf-8", :status => ["403", "Forbidden"]}
+DEFAULTS = {:content_type => "application/json; charset=utf-8", :status => ["200", "OK"]}
+
+PROJECT_ID = 1
+GROUP_ID = 1696170
 
 def fixture_request(verb, url, file)
   FakeWeb.register_uri(verb, url, DEFAULTS.merge(:response => File.join(File.dirname(__FILE__), 'fixtures', file)))
@@ -30,7 +35,8 @@ fixture_request :put, 'http://myapp.airbrake.io/errors/1696170?auth_token=abcdef
 fixture_request :get, 'https://anapp.airbrake.io/errors/1696170.xml?auth_token=abcdefg', 'individual_error.xml'
 
 # notices
-fixture_request :get, "http://myapp.airbrake.io/groups/1696170/notices.xml?auth_token=abcdefg123456", 'notices.xml'
+fixture_request :get, "http://myapp.airbrake.io/api/v4/projects/#{PROJECT_ID}/groups/#{GROUP_ID}/notices?key=abcdefg123456", 'notices.json'
+fixture_request :get, "http://myapp.airbrake.io/api/v4/projects/#{PROJECT_ID}/groups/#{GROUP_ID}/notices?key=abcdefg123456&page=1", 'notices.json'
 fixture_request :get, "http://myapp.airbrake.io/groups/1696170/notices.xml?auth_token=abcdefg123456&page=1", 'notices.xml'
 fixture_request :get, "http://myapp.airbrake.io/groups/1696170/notices.xml?page=1&auth_token=abcdefg123456", 'notices.xml'
 fixture_request :get, "http://myapp.airbrake.io/groups/1696170/notices.xml?auth_token=abcdefg123456&page=2", 'paginated_notices.xml'

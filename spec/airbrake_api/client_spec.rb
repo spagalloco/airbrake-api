@@ -178,9 +178,13 @@ describe AirbrakeAPI::Client do
     end
 
     describe '#notices' do
+      before do
+        @project_id = 1
+        @group_id = 1696170
+      end
       it "finds all error notices" do
-        notices = @client.notices(1696170)
-        expect(notices.size).to eq(42)
+        notices = @client.notices(@project_id, @group_id)
+        expect(notices.size).to eq(2)
       end
 
       it "finds error notices for a specific page" do

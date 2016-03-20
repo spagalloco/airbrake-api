@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Sun, 20 Mar 2016 05:24:04 GMT
+Transfer-Encoding: chunked
+{
+  "notices": [
+    {
+      "id": "1",
+      "projectId": 1,
+      "groupId": "1696170",
+      "createdAt": "2014-10-22T03:00:00.407Z"
+    },
+    {
+      "id": "2",
+      "projectId": 1,
+      "groupId": "1234",
+      "createdAt": "2014-10-22T03:00:00.407Z"
+    }
+  ],
+  "count": 2
+}

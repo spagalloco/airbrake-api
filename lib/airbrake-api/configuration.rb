@@ -48,7 +48,7 @@ module AirbrakeAPI
     end
 
     def account_path
-      "#{protocol}://#{@account}.airbrake.io"
+      "#{protocol}://#{@account}.airbrake.io/api/v4"
     end
 
     def protocol

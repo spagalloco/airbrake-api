@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'multi_xml'
 
   s.add_development_dependency 'bundler', '~> 1.0'
+  s.add_development_dependency 'pry'
 
   s.files = %w(.rspec README.md Rakefile airbrake-api.gemspec)
   s.files += Dir.glob("lib/**/*.rb")
