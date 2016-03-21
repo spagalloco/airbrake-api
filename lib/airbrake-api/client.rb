@@ -152,7 +152,6 @@ module AirbrakeAPI
           request.url(path, :key => @auth_token)
           request.body = params unless params.empty?
         end
-
       end
       response.body
     end
