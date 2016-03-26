@@ -184,35 +184,29 @@ describe AirbrakeAPI::Client do
       end
       it "finds all error notices" do
         notices = @client.notices(@project_id, @group_id)
-        expect(notices.size).to eq(2)
+        expect(notices.size).to eq(40)
       end
 
       it "finds error notices for a specific page" do
-        notices = @client.notices(1696170, :page => 1)
-        expect(notices.size).to eq(30)
-        expect(notices.first.backtrace).not_to eq(nil)
-        expect(notices.first.id).to eq(1234)
+        notices = @client.notices(@project_id, @group_id, :page => 1)
+        expect(notices.size).to eq(20)
+        expect(notices.first.id).to eq("1234")
       end
 
       it "finds all error notices with a page limit" do
-        notices = @client.notices(1696171, :pages => 2)
-        expect(notices.size).to eq(60)
+        notices = @client.notices(@project_id, @group_id, :pages => 2)
+        expect(notices.size).to eq(40)
       end
 
       it "yields batches" do
         batches = []
-        notices = @client.notices(1696171, :pages => 2) do |batch|
+        notices = @client.notices(@project_id, @group_id, :pages => 2) do |batch|
           batches << batch
         end
-        expect(notices.size).to eq(60)
-        expect(batches.map(&:size)).to eq([30,30])
+        expect(notices.size).to eq(40)
+        expect(batches.map(&:size)).to eq([20,20])
       end
 
-      it "can return raw results" do
-        notices = @client.notices(1696170, :raw => true)
-        expect(notices.first.backtrace).to eq(nil)
-        expect(notices.first.id).to eq(1234)
-      end
     end
 
     describe '#connection' do

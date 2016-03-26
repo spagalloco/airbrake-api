@@ -85,7 +85,7 @@ module AirbrakeAPI
     # notices
 
     def notice_path(group_id, project_id)
-      "/api/v4/projects/#{project_id}/notices/#{group_id}"
+      "/api/v4/projects/#{project_id}/groups/#{group_id}/notices"
     end
 
     def notices_path(project_id, group_id)
@@ -109,23 +109,19 @@ module AirbrakeAPI
 
       notices = []
       page_count = 0
+      batches = []
+
       while !options[:pages] || (page_count + 1) <= options[:pages]
         data = request(:get, notices_path(project_id, group_id), :page => page + page_count)
-        batch = if options[:raw]
-          data.notices
-        else
-          # get info like backtraces by doing another api call to notice
-          Parallel.map(data.notices, :in_threads => PARALLEL_WORKERS) do |notice_stub|
-            notice(notice_stub.id, project_id)
-          end
-        end
-        yield batch if block_given?
-        batch.each{|n| notices << n }
+        batch = data["notices"].flatten if data["notices"] != "null"
 
-        break if batch.size < PER_PAGE
+        yield batch if block_given?
+
+        break if data["notices"] == "null" || batch.size < PER_PAGE
         page_count += 1
+        batches << batch
       end
-      notices
+      notices = batches.flatten
     end
 
     private
