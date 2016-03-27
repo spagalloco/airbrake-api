@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Sun, 20 Mar 2016 05:24:04 GMT
+Transfer-Encoding: chunked
+
+{
+  "deploys": [
+    {
+      "environment": "production",
+      "username": "john",
+      "repository": "https://github.com/airbrake/airbrake",
+      "revision": "38748467ea579e7ae64f7815452307c9d05e05c5",
+      "version": "v2.0"
+    }
+  ],
+  "count": 1
+}

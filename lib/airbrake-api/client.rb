@@ -34,11 +34,11 @@ module AirbrakeAPI
 
     def deploys(project_id, options = {})
       results = request(:get, deploys_path(project_id), options)
-      results.deploys.respond_to?(:deploy) ? results.deploys.deploy : []
+      results["deploys"]
     end
 
     def deploys_path(project_id)
-      "/projects/#{project_id}/deploys.xml"
+      "/api/v4/projects/#{project_id}/deploys"
     end
 
     # projects

@@ -102,15 +102,17 @@ describe AirbrakeAPI::Client do
     end
 
     describe '#deploys' do
+      before do
+        @project_id = 1
+      end
       it 'returns an array of deploys' do
-        expect(@client.deploys('12345')).to be_kind_of(Array)
+        expect(@client.deploys(@project_id)).to be_kind_of(Array)
       end
 
       it 'returns deploy data' do
-        deploys = @client.deploys('12345')
+        deploys = @client.deploys(@project_id)
         first_deploy = deploys.first
-
-        expect(first_deploy.rails_env).to eq('production')
+        expect(first_deploy.environment).to eq('production')
       end
 
       it 'returns empty when no data' do
