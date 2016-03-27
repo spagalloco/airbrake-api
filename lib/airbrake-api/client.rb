@@ -43,12 +43,12 @@ module AirbrakeAPI
 
     # projects
     def projects_path
-      '/data_api/v1/projects.xml'
+      '/api/v4/projects'
     end
 
     def projects(options = {})
       results = request(:get, projects_path, options)
-      results.projects.project
+      results["projects"]
     end
 
     # errors

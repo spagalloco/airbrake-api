@@ -126,8 +126,8 @@ describe AirbrakeAPI::Client do
       it 'returns project data' do
         projects = @client.projects
         expect(projects.size).to eq(4)
-        expect(projects.first.id).to eq('1')
-        expect(projects.first.name).to eq('Venkman')
+        expect(projects.first.id).to eq(1)
+        expect(projects.first.name).to eq('Venkman Project')
       end
     end
 

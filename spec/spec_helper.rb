@@ -51,7 +51,7 @@ fixture_request :get, "http://myapp.airbrake.io/groups/1696171/notices/1234.xml?
 fixture_request :get, "http://myapp.airbrake.io/groups/1696172/notices.xml?auth_token=abcdefg123456&page=1", 'unauthorized.xml'
 
 # projects
-fixture_request :get, "http://myapp.airbrake.io/data_api/v1/projects.xml?auth_token=abcdefg123456", 'projects.xml'
+fixture_request :get, "http://myapp.airbrake.io/api/v4/projects?key=abcdefg123456", 'projects.json'
 
 # deploys
 fixture_request :get, "http://myapp.airbrake.io/projects/12345/deploys.xml?auth_token=abcdefg123456", 'deploys.xml'
