@@ -93,12 +93,11 @@ describe AirbrakeAPI::Client do
       AirbrakeAPI.configure(options)
 
       @client = AirbrakeAPI::Client.new
+      @project_id = 1
     end
 
-    it "should fail with errors" do
-      expect {
-        @client.notices(1696172)
-      }.to raise_error(AirbrakeAPI::AirbrakeError, /You are not authorized to see that page/)
+    it "should return error message if an error occurs" do
+      expect(@client.notices(@project_id, 1696172)).to eq(["Project not found or access denied."])
     end
 
     describe '#deploys' do

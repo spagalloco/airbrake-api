@@ -113,11 +113,12 @@ module AirbrakeAPI
 
       while !options[:pages] || (page_count + 1) <= options[:pages]
         data = request(:get, notices_path(project_id, group_id), :page => page + page_count)
-        batch = data["notices"].flatten if data["notices"] != "null"
+        batch = data["notices"].flatten if !is_null?(data["notices"])
+        batches << data["error"] if !is_null?(data["error"])
 
         yield batch if block_given?
 
-        break if data["notices"] == "null" || batch.size < PER_PAGE
+        break if is_null?(data["notices"]) || batch.size < PER_PAGE
         page_count += 1
         batches << batch
       end
@@ -125,6 +126,10 @@ module AirbrakeAPI
     end
 
     private
+
+    def is_null?(msg)
+      msg.nil? || msg == "null"
+    end
 
     def account_path
       "#{protocol}://#{@account}.airbrake.io"
