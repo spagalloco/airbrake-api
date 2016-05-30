@@ -51,40 +51,9 @@ module AirbrakeAPI
       results["projects"]
     end
 
-    # errors
-
-    def unformatted_error_path(error_id)
-      "/errors/#{error_id}"
-    end
-
-    def error_path(error_id)
-      "#{unformatted_error_path(error_id)}.xml"
-    end
-
-    def errors_path(options={})
-      "#{options[:project_id] ? "/projects/#{options[:project_id]}" : nil}/groups.xml"
-    end
-
-    def update(error, options = {})
-      results = request(:put, unformatted_error_path(error), options)
-      results.group
-    end
-
-    def error(error_id, options = {})
-      results = request(:get, error_path(error_id), options)
-      results.group || results.groups
-    end
-
-    def errors(options = {})
-      options = options.dup
-      project_id = options.delete(:project_id)
-      results = request(:get, errors_path(:project_id => project_id), options)
-      results.group || results.groups
-    end
-
     # notices
 
-    def notice_path(group_id, project_id)
+    def notice_path(project_id, group_id)
       "/api/v4/projects/#{project_id}/groups/#{group_id}/notices"
     end
 
@@ -92,8 +61,8 @@ module AirbrakeAPI
       "/api/v4/projects/#{project_id}/groups/#{group_id}/notices"
     end
 
-    def notice(group_id, project_id, options = {})
-      hash = request(:get, notice_path(group_id, project_id), options)
+    def notice(project_id, group_id, options = {})
+      hash = request(:get, notice_path(project_id, group_id), options)
       hash.notice
     end
 

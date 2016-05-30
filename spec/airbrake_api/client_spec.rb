@@ -132,55 +132,9 @@ describe AirbrakeAPI::Client do
       end
     end
 
-    describe '#update' do
-      it 'should update the status of an error' do
-        error = @client.update(1696170, :group => { :resolved => true})
-        expect(error.resolved).to be_truthy
-      end
-    end
-
-    describe '#errors' do
-      it "should find a page of the 30 most recent errors" do
-        errors = @client.errors
-        ordered = errors.sort_by(&:most_recent_notice_at).reverse
-        expect(ordered).to eq(errors)
-        expect(errors.size).to eq(30)
-      end
-
-      it "should paginate errors" do
-        errors = @client.errors(:page => 2)
-        ordered = errors.sort_by(&:most_recent_notice_at).reverse
-        expect(ordered).to eq(errors)
-        expect(errors.size).to eq(2)
-      end
-
-      it "should use project_id for error path" do
-        expect(@client).to receive(:request).with(:get, "/projects/123/groups.xml", {}).and_return(double(:group => 111))
-        @client.errors(:project_id => 123)
-      end
-    end
-
-    describe '#error' do
-      it "should find an individual error" do
-        error = @client.error(1696170)
-        expect(error.action).to eq('index')
-        expect(error.id).to eq(1696170)
-      end
-    end
-
-    describe '#notice' do
-      it "finds individual notices" do
-        expect(@client.notice(1234, 1696170)).not_to be_nil
-      end
-
-      it "finds broken notices" do
-        expect(@client.notice(666, 1696170)).not_to be_nil
-      end
-    end
-
     describe '#notices' do
       before do
-        @project_id = 1
+        @project_id = 1234
         @group_id = 1696170
       end
       it "finds all error notices" do
@@ -191,7 +145,7 @@ describe AirbrakeAPI::Client do
       it "finds error notices for a specific page" do
         notices = @client.notices(@project_id, @group_id, :page => 1)
         expect(notices.size).to eq(20)
-        expect(notices.first.id).to eq("1234")
+        expect(notices.first.id).to eq("5321")
       end
 
       it "finds all error notices with a page limit" do
