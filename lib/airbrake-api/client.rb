@@ -34,70 +34,39 @@ module AirbrakeAPI
 
     def deploys(project_id, options = {})
       results = request(:get, deploys_path(project_id), options)
-      results.deploys.respond_to?(:deploy) ? results.deploys.deploy : []
+      results["deploys"]
     end
 
     def deploys_path(project_id)
-      "/projects/#{project_id}/deploys.xml"
+      "/api/v4/projects/#{project_id}/deploys"
     end
 
     # projects
     def projects_path
-      '/data_api/v1/projects.xml'
+      '/api/v4/projects'
     end
 
     def projects(options = {})
       results = request(:get, projects_path, options)
-      results.projects.project
-    end
-
-    # errors
-
-    def unformatted_error_path(error_id)
-      "/errors/#{error_id}"
-    end
-
-    def error_path(error_id)
-      "#{unformatted_error_path(error_id)}.xml"
-    end
-
-    def errors_path(options={})
-      "#{options[:project_id] ? "/projects/#{options[:project_id]}" : nil}/groups.xml"
-    end
-
-    def update(error, options = {})
-      results = request(:put, unformatted_error_path(error), options)
-      results.group
-    end
-
-    def error(error_id, options = {})
-      results = request(:get, error_path(error_id), options)
-      results.group || results.groups
-    end
-
-    def errors(options = {})
-      options = options.dup
-      project_id = options.delete(:project_id)
-      results = request(:get, errors_path(:project_id => project_id), options)
-      results.group || results.groups
+      results["projects"]
     end
 
     # notices
 
-    def notice_path(notice_id, error_id)
-      "/groups/#{error_id}/notices/#{notice_id}.xml"
+    def notice_path(project_id, group_id)
+      "/api/v4/projects/#{project_id}/groups/#{group_id}/notices"
     end
 
-    def notices_path(error_id)
-      "/groups/#{error_id}/notices.xml"
+    def notices_path(project_id, group_id)
+      "/api/v4/projects/#{project_id}/groups/#{group_id}/notices"
     end
 
-    def notice(notice_id, error_id, options = {})
-      hash = request(:get, notice_path(notice_id, error_id), options)
+    def notice(project_id, group_id, options = {})
+      hash = request(:get, notice_path(project_id, group_id), options)
       hash.notice
     end
 
-    def notices(error_id, options = {}, &block)
+    def notices(project_id, group_id, options = {}, &block)
       # a specific page is requested, only return that page
       # if no page is specified, start on page 1
       if options[:page]
@@ -109,27 +78,27 @@ module AirbrakeAPI
 
       notices = []
       page_count = 0
+      batches = []
+
       while !options[:pages] || (page_count + 1) <= options[:pages]
-        data = request(:get, notices_path(error_id), :page => page + page_count)
+        data = request(:get, notices_path(project_id, group_id), :page => page + page_count)
+        batch = data["notices"].flatten if !is_null?(data["notices"])
+        batches << data["error"] if !is_null?(data["error"])
 
-        batch = if options[:raw]
-          data.notices
-        else
-          # get info like backtraces by doing another api call to notice
-          Parallel.map(data.notices, :in_threads => PARALLEL_WORKERS) do |notice_stub|
-            notice(notice_stub.id, error_id)
-          end
-        end
         yield batch if block_given?
-        batch.each{|n| notices << n }
 
-        break if batch.size < PER_PAGE
+        break if is_null?(data["notices"]) || batch.size < PER_PAGE
         page_count += 1
+        batches << batch
       end
-      notices
+      notices = batches.flatten
     end
 
     private
+
+    def is_null?(msg)
+      msg.nil? || msg == "null"
+    end
 
     def account_path
       "#{protocol}://#{@account}.airbrake.io"
@@ -148,9 +117,9 @@ module AirbrakeAPI
       response = connection(options).run_request(method, nil, nil, nil) do |request|
         case method
         when :delete, :get
-          request.url(path, params.merge(:auth_token => @auth_token))
+          request.url(path, params.merge(:key => @auth_token))
         when :post, :put
-          request.url(path, :auth_token => @auth_token)
+          request.url(path, :key => @auth_token)
           request.body = params unless params.empty?
         end
       end
@@ -160,7 +129,7 @@ module AirbrakeAPI
     def connection(options={})
       default_options = {
         :headers => {
-          :accept => 'application/xml',
+          :accept => 'application/json',
           :user_agent => user_agent,
         },
         :ssl => {:verify => false},
@@ -168,8 +137,8 @@ module AirbrakeAPI
       }
       @connection ||= Faraday.new(default_options.deep_merge(connection_options)) do |builder|
         middleware.each { |mw| builder.use *mw }
-
         builder.adapter adapter
+        builder.response :json, :content_type => /\bjson$/
       end
     end
 
